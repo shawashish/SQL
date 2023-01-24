@@ -1,0 +1,42 @@
+CREATE Table if not exists city(
+id int not NULL,
+name VARCHAR(17),
+countrycode VARCHAR(3),
+district VARCHAR(20),
+population int DEFAULT 0,
+constraint pk PRIMARY KEY(id)
+);
+
+select * from city;
+
+drop TABLE city;
+
+insert into city (id,name,countrycode,district,population) VALUES
+(6,'Rotterdam','NLD','Zuid-Holland',null),
+(19,'Zaanstad','NLD','Noord-Holland',135621),
+(214,'Porto Alegre','BRA','Rio Grande do Sul',1314032),
+(397,'Lauro de Freitas','BRA','Bahia',109236),
+(547,'Dobric','BGR','Varna',100399),
+(552,'Bujumbura','BDI','Bujumbura',300000);
+
+INSERT INTO city VALUES
+(553,'Bujumbura','USA','New York',300000);
+
+INSERT INTO city VALUES
+(1661,'Kolkata','IND','New Town',300000);
+
+
+INSERT INTO city VALUES
+(1662,'Beijing','JPN','Holland',300000);
+
+select * from city where countrycode = 'USA' and population > 100000;
+
+select name from city where countrycode = 'USA' and population > 120000;
+
+select * from city;
+
+select * from city where id = 1661;
+
+select * from city where countrycode = 'JPN';
+
+SELECT name from city where countrycode = 'JPN';
