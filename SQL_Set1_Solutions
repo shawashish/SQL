@@ -33,6 +33,28 @@ select * from city where countrycode = 'USA' and population > 100000;
 
 select name from city where countrycode = 'USA' and population > 120000;
 
+CREATE Table if not exists station(
+id int not NULL,
+city VARCHAR(21),
+state VARCHAR(2),
+lat_n int,
+long_w int,
+constraint pk PRIMARY KEY(id)
+);
+
+INSERT INTO station VALUES
+(1662,'Kolkata','WB',98,105);
+
+
+INSERT INTO station VALUES
+(1661,'Jaipur','RJ',97,111);
+
+SELECT * from station;
+
+SELECT city,state from station;
+
+select city from station where mod(id,2) = 0
+
 select * from city;
 
 select * from city where id = 1661;
