@@ -57,8 +57,26 @@ INSERT INTO station VALUES
 INSERT INTO station VALUES
 (1661,'Jaipur','RJ',97,111);
 
+INSERT INTO station VALUES
+(1663,'Jaipur','RG',99,112);
+
+
+INSERT INTO station VALUES
+(988,'Mullan','ID',143,154),
+(987,'Hartland','MI',136,107),
+(985,'Winslow','AR',126,126),
+(983,'Patriot','IN',82,46),
+(986,'Holbrook','AZ',134,103),
+(999,'Hol','HO',133,102),
+(911,'Win','WI',165,111);;;
+
 SELECT * from station;
 
 SELECT city,state from station;
 
-select city from station where mod(id,2) = 0
+select distinct(city) from station where mod(id,2) = 0;
+
+select count(*) - count(DISTINCT(city)) as Net_Count from station;
+
+select city, LENGTH(city) as length from station ORDER BY length(city) asc, city asc limit 1;
+select city, LENGTH(city) as length from station ORDER BY LENGTH(city) desc,city asc limit 1;
