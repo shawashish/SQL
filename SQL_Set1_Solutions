@@ -33,6 +33,14 @@ select * from city where countrycode = 'USA' and population > 100000;
 
 select name from city where countrycode = 'USA' and population > 120000;
 
+select * from city;
+
+select * from city where id = 1661;
+
+select * from city where countrycode = 'JPN';
+
+SELECT name from city where countrycode = 'JPN';
+
 CREATE Table if not exists station(
 id int not NULL,
 city VARCHAR(21),
@@ -54,11 +62,3 @@ SELECT * from station;
 SELECT city,state from station;
 
 select city from station where mod(id,2) = 0
-
-select * from city;
-
-select * from city where id = 1661;
-
-select * from city where countrycode = 'JPN';
-
-SELECT name from city where countrycode = 'JPN';
