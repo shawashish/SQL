@@ -100,3 +100,38 @@ or RIGHT(city,1) not in ('A','E','I','O','U');
 
 SELECT distinct(city) from station where left(city,1) not in ('A','E','I','O','U')
 and RIGHT(city,1) not in ('A','E','I','O','U');
+
+
+CREATE Table if not exists Product(
+product_id int not NULL,
+product_name VARCHAR(20),
+unit_price int,
+constraint pk PRIMARY KEY(product_id)
+);
+
+CREATE Table if not exists Sales(
+seller_id int not NULL,
+product_id int,
+buyer_id int,
+sale_date DATE,
+quantity int,
+price int,
+constraint fk Foreign Key (product_id) REFERENCES Product(product_id)
+);
+
+insert into Product VALUES
+(1,'S8',1000),
+(2,'G4',800),
+(3,'iPhone',1400);
+
+SELECT * FROM Product;
+
+INSERT INTO Sales VALUES
+(1, 1, 1, '2019-01-21', 2, 2000),
+(1, 2, 2, '2019-02-17', 1, 800),
+(2, 2, 3, '2019-06-02', 1, 800),
+(3, 3, 4,'2019-05-13', 2, 2800);
+
+SELECT * FROM Sales;
+
+
