@@ -80,3 +80,23 @@ select count(*) - count(DISTINCT(city)) as Net_Count from station;
 
 select city, LENGTH(city) as length from station ORDER BY length(city) asc, city asc limit 1;
 select city, LENGTH(city) as length from station ORDER BY LENGTH(city) desc,city asc limit 1;
+
+
+SELECT distinct(city) from station where left(city,1) in ('A','E','I','O','U');
+
+SELECT distinct(city) from station where substr(city,1,1) in ('A','E','I','O','U');
+
+SELECT distinct(city) from station where right(city,1) in ('A','E','I','O','U');
+
+SELECT distinct(city) from station where substr(city,-1,1) in ('A','E','I','O','U');
+
+SELECT distinct(city) from station where left(city,1) not in ('A','E','I','O','U');
+
+SELECT distinct(city) from station where right(city,1) not in ('A','E','I','O','U');
+
+
+SELECT distinct(city) from station where left(city,1) not in ('A','E','I','O','U')
+or RIGHT(city,1) not in ('A','E','I','O','U');
+
+SELECT distinct(city) from station where left(city,1) not in ('A','E','I','O','U')
+and RIGHT(city,1) not in ('A','E','I','O','U');
