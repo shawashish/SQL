@@ -186,5 +186,5 @@ select * FROM Delivery;
 
 with cte As
 (select count(delivery_id) as immediate_orders from Delivery where order_date = customer_pref_delivery_date)
-select round(100*(select immediate_orders from cte)/count(delivery_id),2) from Delivery;
+select round(100*(select immediate_orders from cte)/count(delivery_id),2) as immediate_percentage from Delivery;
 
