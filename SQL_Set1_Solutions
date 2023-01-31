@@ -242,3 +242,19 @@ inner join cte f
 on e.team_id = f.team_id
 order by e.employee_id;
 
+select employee_id,count(team_id)
+over(PARTITION BY team_id)
+from Employee
+order by employee_id;
+
+
+select ct.country_name,
+case when avg(wt.weather_state) <= 15 then 'Cold'
+    when avg(wt.weather_state) >=25 then 'Hot'
+    else 'Warm'
+    END as weather_type
+from Weather wt
+inner join Countries ct
+on wt.country_id = ct.country_id
+where wt.day BETWEEN '2019-11-01' and '2019-11-30'
+group by ct.country_name;
