@@ -215,3 +215,30 @@ from Ads
 group by ad_id
 order by ctr desc, ad_id;
 
+CREATE Table if not exists Employee(
+employee_id int not NULL,
+team_id int,
+constraint pk PRIMARY KEY(employee_id)
+);
+
+INSERT INTO Employee VALUES
+(1, 8),
+(2, 8),
+(3,8),
+(4, 7),
+(5, 9),
+(6, 9);
+
+SELECT * FROM Employee;
+
+with cte as(
+select team_id,count(team_id) as team_size
+from Employee
+GROUP BY team_id
+order by team_id)
+select e.employee_id,f.team_size
+from Employee e
+inner join cte f
+on e.team_id = f.team_id
+order by e.employee_id;
+
