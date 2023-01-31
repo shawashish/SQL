@@ -258,3 +258,12 @@ inner join Countries ct
 on wt.country_id = ct.country_id
 where wt.day BETWEEN '2019-11-01' and '2019-11-30'
 group by ct.country_name;
+
+
+select pr.product_id,
+round(sum(us.units* pr.price)/SUM(us.units),2) as average_price
+from Prices pr
+left join UnitsSold us
+on pr.product_id = us.product_id
+where us.purchase_date BETWEEN pr.start_date and pr.end_date
+group by pr.product_id;
