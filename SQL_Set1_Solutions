@@ -296,3 +296,47 @@ select player_id,device_id,
 row_number() OVER(PARTITION BY player_id) as rn
 from Activity)
 select player_id,device_id from cte where rn = 1;
+
+CREATE Table if not exists Products(
+product_id int not NULL,
+product_name VARCHAR(40),
+product_category VARCHAR(20),
+constraint pk1 PRIMARY KEY(product_id)
+);
+
+CREATE Table if not exists Orders(
+product_id int not NULL,
+order_date DATE,
+unit int,
+constraint fk1 Foreign Key (product_id) REFERENCES Products(product_id)
+);
+
+insert into Products VALUES
+(1, 'Leetcode Solutions', 'Book'),
+(2, 'Jewels of Stringology', 'Book'),
+(3, 'HP', 'Laptop'),
+(4, 'Lenovo', 'Laptop'),
+(5, 'Leetcode Kit', 'T-shirt');
+
+INSERT INTO Orders VALUES
+(1, '2020-02-05' ,60),
+(1, '2020-02-10' ,70),
+(2, '2020-01-18' ,30),
+(2, '2020-02-11' ,80),
+(3, '2020-02-17' ,2),
+(3, '2020-02-24' ,3),
+(4, '2020-03-01' ,20),
+(4, '2020-03-04' ,30),
+(4, '2020-03-04' ,60),
+(5, '2020-02-25' ,50),
+(5, '2020-02-27' ,50),
+(5, '2020-03-01' ,50);
+
+select pt.product_name,SUM(od.unit) as total_units
+from Products pt
+inner JOIN Orders od
+on pt.product_id = od.product_id
+where left(od.order_date,7) = '2020-02'
+group by pt.product_name
+having SUM(od.unit) >=100;
+
