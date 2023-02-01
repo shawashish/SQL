@@ -340,3 +340,24 @@ where left(od.order_date,7) = '2020-02'
 group by pt.product_name
 having SUM(od.unit) >=100;
 
+CREATE Table if not exists Users(
+user_id int not NULL,
+name VARCHAR(20),
+mail VARCHAR(20),
+constraint pk3 PRIMARY KEY(user_id)
+);
+
+INSERT INTO Users VALUES
+(1, 'Winston', 'winston@leetcode.com'),
+(2, 'Jonathan', 'jonathanisgreat'),
+(3, 'Annabelle', 'bella-@leetcode.com'),
+(4, 'Sally' ,'sally.come@leetcode.com'),
+(5, 'Marwan', 'quarz#2020@leetcode.com'),
+(6, 'David' ,'david69@gmail.com'),
+(7, 'Shapiro', '.shapo@leetcode.com');
+
+alter Table Users MODIFY mail VARCHAR(255);
+
+select * 
+from Users
+where mail regexp '^[A-Za-z][A-Za-z0-9\_\.\-]*@leetcode\.com$'
