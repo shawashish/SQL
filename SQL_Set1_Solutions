@@ -361,3 +361,55 @@ alter Table Users MODIFY mail VARCHAR(255);
 select * 
 from Users
 where mail regexp '^[A-Za-z][A-Za-z0-9\_\.\-]*@leetcode\.com$'
+
+
+
+select o.customer_id, name
+from
+Orders o
+join
+Product p
+on o.product_id = p.product_id
+join
+Customers c
+on o.customer_id = c.customer_id
+group by o.customer_id, c.name
+having sum(case when left(order_date,7)='2020-06'
+then price*quantity end) >= 100
+and 
+sum(case when left(order_date,7)='2020-07'
+then price*quantity end) >= 100
+;
+
+
+with cte1 as (
+    select o.customer_id, name
+from
+Orders o
+join
+Product p
+on o.product_id = p.product_id
+join
+Customers c
+on o.customer_id = c.customer_id
+where left(order_date,7) = '2020-06'
+group by o.customer_id, c.name
+having sum(price*quantity) >= 100
+),
+cte2 as (
+   select o.customer_id, name
+from
+Orders o
+join
+Product p
+on o.product_id = p.product_id
+join
+Customers c
+on o.customer_id = c.customer_id
+where left(order_date,7) = '2020-07'
+group by o.customer_id, c.name
+having sum(price*quantity) >= 100 
+)
+select ab.customer_id,ab.name
+from cte1 ab inner JOIN cte2 cd
+on ab.customer_id = cd.customer_id;
