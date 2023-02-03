@@ -656,6 +656,8 @@ insert into MovieRating VALUES
 (3, 1, 3, '2020-02-22'),
 (3, 2, 4, '2020-02-25');
 
+
+
 with cte as(
 select user_id,count(user_id) as total_count
 from MovieRating
@@ -665,6 +667,11 @@ inner join cte ct
 on us.user_id = ct.user_id
 order By ct.total_count desc, us.name asc limit 1;
 
-SELECT title from Movies where movie_id = (SELECT movie_id from MovieRating
-order by rating desc limit 1)
-order by title asc;
+with cte1 as (SELECT movie_id,avg(rating) as average_rating from MovieRating
+where left(created_at,7) = '2020-02'
+group by movie_id
+order by avg(rating) desc)
+select mv.title from Movies mv
+inner join cte1 ct
+on mv.movie_id = ct.movie_id
+order by ct.average_rating desc, mv.title asc limit 1;
