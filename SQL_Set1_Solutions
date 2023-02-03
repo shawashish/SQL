@@ -675,3 +675,65 @@ select mv.title from Movies mv
 inner join cte1 ct
 on mv.movie_id = ct.movie_id
 order by ct.average_rating desc, mv.title asc limit 1;
+
+CREATE Table if not exists Departments(
+id int not NULL,
+name int,
+constraint pk PRIMARY KEY(id)
+);
+
+alter table Departments MODIFY name VARCHAR(20);
+alter table Departments MODIFY name VARCHAR(40);
+CREATE Table if not exists Students(
+id int not NULL,
+name VARCHAR(20),
+department_id int,
+constraint pk1 PRIMARY KEY(id)
+);
+
+alter table Students MODIFY name VARCHAR(40);
+
+insert into Departments VALUES
+(1, 'Electrical Engineering'),
+(7, 'Computer Engineering'),
+(13, 'Business Administration');
+
+insert into Students VALUES
+(23, 'Alice', 1),
+(1, 'Bob', 7),
+(5, 'Jennifer', 13),
+(2, 'John', 14),
+(4, 'Jasmine', 77),
+(3, 'Steve', 74),
+(6, 'Luis', 1),
+(8, 'Jonathan', 7),
+(7, 'Daiana', 33),
+(11, 'Madelynn', 1);
+
+select id, name from Students where department_id not in (select id FROM Departments);
+
+CREATE Table if not exists Calls(
+from_id int,
+to_id int,
+duration int
+);
+
+insert into Calls values
+(1, 2, 59),
+(2, 1, 11),
+(1, 3, 20),
+(3, 4, 100),
+(3, 4, 200),
+(3, 4, 200),
+(4, 3, 499);
+
+
+select from_id as person1,to_id as person2,
+    count(duration) as call_count, sum(duration) as total_duration
+from (select * 
+      from Calls 
+      union all
+      select to_id, from_id, duration 
+      from Calls) t1
+where from_id < to_id
+group by person1, person2;
