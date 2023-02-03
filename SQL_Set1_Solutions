@@ -413,3 +413,84 @@ having sum(price*quantity) >= 100
 select ab.customer_id,ab.name
 from cte1 ab inner JOIN cte2 cd
 on ab.customer_id = cd.customer_id;
+
+
+CREATE Table if not exists TVProgram(
+program_date date,
+content_id VARCHAR(20),
+channel VARCHAR(20),
+constraint pk PRIMARY KEY(program_date,content_id)
+);
+
+alter table TVProgram modify content_id int;
+
+CREATE Table if not exists Content(
+content_id int,
+title VARCHAR(20),
+kids_content ENUM('Y','N'),
+content_type VARCHAR(20),
+constraint pk PRIMARY KEY(content_id)
+);
+
+INSERT into TVProgram VALUES
+('2020-06-10 08:00', 1, 'LC-Channel'),
+('2020-05-11 12:00', 2, 'LC-Channel'),
+('2020-05-12 12:00', 3, 'LC-Channel'),
+('2020-05-13 14:00', 4, 'Disney Ch'),
+('2020-06-18 14:00', 4, 'Disney Ch'),
+('2020-07-15 16:00', 5, 'Disney Ch');
+
+insert into Content VALUES
+(1, 'Leetcode Movie', 'N', 'Movies'),
+(2, 'Alg. for Kids', 'Y', 'Series'),
+(3, 'Database Sols', 'N', 'Series'),
+(4, 'Aladdin', 'Y', 'Movies'),
+(5, 'Cinderella', 'Y', 'Movies');
+
+
+SELECT ct.title
+from TVProgram tv
+inner join Content ct
+on tv.content_id = ct.content_id
+where ct.kids_content = 'Y'
+and ct.content_type = 'Movies'
+and LEFT(tv.program_date,7) = '2020-06';
+
+CREATE Table if not exists NPV(
+id int,
+year int,
+npv int,
+constraint pk PRIMARY KEY(id,year)
+);
+
+CREATE Table if not exists Queries(
+id int,
+year int,
+constraint pk PRIMARY KEY(id,year)
+);
+
+INSERT into NPV VALUES
+(1, 2018, 100),
+(7, 2020, 30),
+(13, 2019, 40),
+(1, 2019, 113),
+(2, 2008, 121),
+(3, 2009, 12),
+(11, 2020, 99),
+(7, 2019, 0);
+
+insert into Queries VALUES
+(1, 2019),
+(2, 2008),
+(3, 2009),
+(7, 2018),
+(7, 2019),
+(7,2020),
+(13, 2019);
+
+select q.id,q.year,IFNULL(n.npv,0) as NPV
+from NPV n
+right JOIN
+Queries q
+on q.id = n.id 
+and q.year = n.year;
