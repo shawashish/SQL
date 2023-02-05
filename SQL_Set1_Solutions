@@ -1057,3 +1057,90 @@ where book_id not in (
     having sum(quantity) >= 10)
 and 
     available_from < date_sub('2019-06-23', interval 1 month)
+
+
+
+CREATE Table if not exists Enrollments(
+student_id int not NULL,
+course_id int,
+grade int,
+constraint pk PRIMARY KEY(student_id,course_id)
+);
+
+insert into Enrollments VALUES
+(2, 2, 95),
+(2, 3, 95),
+(1, 1, 90),
+(1, 2, 99),
+(3, 1, 80),
+(3, 2, 75),
+(3, 3, 82);
+
+SELECT * FROM Enrollments;
+with cte as (
+select *,rank()
+over(PARTITION BY student_id ORDER BY grade desc,course_id) as rn FROM Enrollments)
+select student_id,course_id,grade from cte where rn = 1;
+
+drop table Teams;
+CREATE Table if not exists Players(
+player_id int not NULL,
+group_id int,
+constraint pk PRIMARY KEY(player_id)
+);
+
+CREATE Table if not exists Matches(
+match_id int not NULL,
+first_player int,
+second_player int,
+first_score int,
+second_score int,
+constraint pk PRIMARY KEY(match_id)
+);
+
+insert into Players VALUES
+(15, 1),
+(25, 1),
+(30, 1),
+(45, 1),
+(10, 2),
+(35, 2),
+(50, 2),
+(20, 3),
+(40, 3);
+
+insert into Matches VALUES
+(1, 15, 45, 3, 0), 
+(2, 30, 25, 1, 2), 
+(3, 30, 15, 2, 0),
+(4, 40, 20, 5, 2),    
+(5, 35, 50, 1, 1);
+
+
+
+with cte as (
+select sc.group_id group_id, sc.player_id player_id, 
+       rank() over (partition by sc.group_id order by sum(sc.score) desc, sc.player_id asc) as rnk 
+    from(
+        select p.group_id group_id,
+         p.player_id player_id ,
+         sum(m.first_score) as score
+        from Players p
+        inner join Matches m
+        on p.player_id = m.first_player
+        group by p.group_id,p.player_id
+        
+        union all
+        
+        select p.group_id group_id,
+         p.player_id player_id ,
+        sum(second_score) as score
+        from Players p
+        inner join Matches m
+        on p.player_id = m.second_player
+        group by p.group_id,p.player_id
+    ) sc
+    group by sc.group_id,sc.player_id)
+    select group_id,player_id from cte where rnk =1;
+
+
