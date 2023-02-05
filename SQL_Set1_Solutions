@@ -737,3 +737,82 @@ from (select *
       from Calls) t1
 where from_id < to_id
 group by person1, person2;
+
+
+CREATE Table if not exists Prices(
+product_id int not NULL,
+start_date date,
+end_date date,
+price int,
+constraint pk PRIMARY KEY(product_id,start_date,end_date)
+);
+
+CREATE Table if not exists UnitsSold(
+product_id int not NULL,
+purchase_date date,
+units int
+);
+
+insert INTO Prices VALUES
+(1, '2019-02-17', '2019-02-28', 5),
+(1, '2019-03-01', '2019-03-22', 20),
+(2, '2019-02-01', '2019-02-20', 15),
+(2, '2019-02-21', '2019-03-31', 30);
+
+Insert into UnitsSold VALUES
+(1, '2019-02-25', 100),
+(1, '2019-03-01', 15),
+(2, '2019-02-10', 200),
+(2, '2019-03-22', 30);
+
+select pt.product_id, round(sum(pt.price*us.units)/sum(us.units),2) as avg_selling_price
+from Prices pt
+inner join UnitsSold us
+on pt.product_id = us.product_id
+where us.purchase_date BETWEEN pt.start_date and pt.end_date
+GROUP BY pt.product_id;
+
+CREATE Table if not exists Warehouse(
+name VARCHAR(17),
+product_id int,
+units int,
+constraint pk PRIMARY KEY(name,product_id)
+);
+
+CREATE Table if not exists Products(
+product_id int,
+product_name VARCHAR(30),
+width int,
+length int,
+height int,
+constraint pk PRIMARY KEY(product_id)
+);
+
+insert into Warehouse VALUES
+('LCHouse1', 1, 1),
+('LCHouse1', 2, 10),
+('LCHouse1', 3, 5),
+('LCHouse2', 1, 2),
+('LCHouse2', 2, 2),
+('LCHouse3', 4, 1);
+
+insert into Products VALUES
+(1, 'LC-TV', 5, 50, 40),
+(2, 'LC-KeyChain', 5, 5, 5),
+(3, 'LC-Phone', 2, 10, 10),
+(4, 'LC-T-Shirt', 4, 10, 20);
+
+select w.name,sum(w.units*pt.width*pt.length*pt.height) as volume
+from Warehouse w
+inner join Products pt
+on w.product_id = pt.product_id
+group by w.name;
+
+with cte as 
+(select product_id,length*width*height as volume from Products
+group by product_id)
+select w.name,sum(w.units*ct.volume) as final_volume from Warehouse w
+INNER join cte ct
+on w.product_id = ct.product_id
+GROUP BY w.name;
+
