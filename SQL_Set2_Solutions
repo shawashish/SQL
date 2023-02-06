@@ -1,0 +1,61 @@
+CREATE Table if not exists World(
+name VARCHAR(30),
+continent VARCHAR(20),
+area int,
+population int,
+gdp int,
+constraint pk PRIMARY KEY(name)
+);
+
+ALTER TABLE World MODIFY gdp BIGINT;
+
+INSERT into World VALUES
+('Afghanistan', 'Asia', 652230, 25500100, 20343000000),
+('Albania', 'Europe', 28748, 2831741, 12960000000),
+('Algeria', 'Africa', 2381741, 37100000, 188681000000),
+('Andorra', 'Europe', 468, 78115, 3712000000),
+('Angola', 'Africa', 1246700, 20609294, 100990000000);
+
+SELECT name,population,area FROM World where area >=3000000 or population >= 25000000;
+
+CREATE Table if not exists Customer(
+id int not NULL,
+name VARCHAR(20),
+refree_id int,
+constraint pk PRIMARY KEY(id)
+);
+
+INSERT INTO Customer VALUES
+(1, 'Will', null),
+(2, 'Jane', null),
+(3, 'Alex', 2),
+(4, 'Bill', null),
+(5, 'Zack', 1),
+(6, 'Mark', 2);
+
+SELECT name from Customer where refree_id != 2 or refree_id is NULL;
+
+CREATE Table if not exists Customers(
+id int not NULL,
+name VARCHAR(20),
+constraint pk PRIMARY KEY(id)
+);
+
+CREATE Table if not exists Orders(
+id int not NULL,
+customerId int,
+constraint pk PRIMARY KEY(id),
+constraint fk Foreign Key (customerId) REFERENCES Customers(id)
+);
+
+insert into Customers VALUES
+(1, 'Joe'),
+(2, 'Henry'),
+(3, 'Sam'),
+(4, 'Max');
+
+INSERT into Orders VALUES
+(1, 3),
+(2, 1);
+
+select name from Customers where id not in (select customerId from Orders);
