@@ -139,3 +139,116 @@ select callee_id as id, duration from Calls) cal
 on p.id = cal.id
 group by c.name
 having avg(cal.duration) > (select avg(duration) FROM Calls);
+
+
+
+CREATE Table if not exists Activity(
+player_id int not NULL,
+device_id int,
+event_date date,
+games_played int,
+constraint pk PRIMARY KEY(player_id,event_date)
+);
+
+insert into Activity VALUES
+(1, 2, '2016-03-01', 5),
+(1, 2, '2016-05-02', 6),
+(2, 3, '2017-06-25', 1),
+(3, 1, '2016-03-02', 0),
+(3, 4, '2018-07-03', 5);
+
+
+select player_id,device_id from (
+select player_id,device_id,
+row_number() OVER(PARTITION BY player_id) as rn
+from Activity) a
+where a.rn =1;
+
+CREATE Table if not exists Orders(
+order_number int NOT NULL,
+customer_number int,
+constraint pk PRIMARY KEY(order_number)
+);
+
+INSERT into Orders VALUES
+(1, 1),
+(2, 2),
+(3,3),
+(4, 3);
+
+select customer_number from (
+select customer_number,
+RANK() over(PARTITION BY customer_number) as rn
+from Orders) a
+ORDER BY a.rn desc limit 1;
+
+INSERT into Orders VALUES
+(5, 2);
+
+SELECT * FROM Orders;
+with cte as (
+select customer_number,
+RANK() over(PARTITION BY customer_number ORDER BY order_number) as rn
+from Orders)
+select customer_number from cte where rn = (select max(rn) from cte);
+
+CREATE Table if not exists Cinema(
+seat_id int not NULL,
+free BOOLEAN,
+constraint pk PRIMARY KEY(seat_id)
+);
+
+insert into Cinema VALUES
+(1, 1),
+(2, 0),
+(3, 1),
+(4, 1),
+(5, 1);
+
+with cte as (
+select seat_id,
+lead(seat_id,1,0) over() as next_seat
+from Cinema
+ORDER BY seat_id)
+select c.seat_id from Cinema c
+inner join cte ct
+on c.seat_id = ct.next_seat
+where c.free = 1;
+
+CREATE Table if not exists SalesPerson(
+sales_id int NOT NULL,
+name VARCHAR(20),
+salary int,
+commission_rate int,
+hire_date DATE,
+constraint pk PRIMARY KEY(sales_id)
+);
+
+CREATE Table if not exists Company(
+com_id int,
+name VARCHAR(20),
+city VARCHAR(20),
+constraint pk PRIMARY KEY(com_id)
+);
+
+CREATE Table if not exists Orders(
+order_id int not NULL,
+order_date DATE,
+com_id int,
+sales_id int,
+amount int,
+constraint pk PRIMARY KEY(name),
+constraint fk1 Foreign Key (com_id) REFERENCES Company(com_id),
+constraint fk2 Foreign Key (sales_id) REFERENCES SalesPerson(sales_id)
+);
+
+insert into SalesPerson VALUES
+(1, 'John', 100000, 6, STR_TO_DATE('4/1/2006','%m/%d/%Y'));
+insert into SalesPerson VALUES
+(2, 'Amy', 12000, 5, STR_TO_DATE('5/1/2010','%m/%d/%Y')),
+(3, 'Mark', 65000, 12, STR_TO_DATE('12/25/2008','%m/%d/%Y')),
+(4, 'Pam', 25000, 25, STR_TO_DATE('1/1/2005','%m/%d/%Y')),
+(5, 'Alex', 5000, 10, STR_TO_DATE('2/3/2007','%m/%d/%Y'));
+
+SELECT * FROM SalesPerson;
+
