@@ -59,3 +59,83 @@ INSERT into Orders VALUES
 (2, 1);
 
 select name from Customers where id not in (select customerId from Orders);
+
+
+CREATE Table if not exists Employee(
+employee_id int not NULL,
+team_id int,
+constraint pk PRIMARY KEY(employee_id)
+);
+
+INSERT into Employee VALUES
+(1, 8),
+(2, 8),
+(3, 8),
+(4, 7),
+(5, 9),
+(6, 9);
+
+SELECT employee_id,count(team_id)
+over(PARTITION BY team_id) as team_size
+from Employee
+ORDER BY employee_id;
+
+CREATE Table if not exists Person
+(id int NOT NULL,
+name VARCHAR(30),
+phone_number VARCHAR(20),
+constraint pk PRIMARY KEY(id)
+);
+
+CREATE Table if not exists Country(
+name VARCHAR(30),
+country_code VARCHAR(3),
+constraint pk PRIMARY KEY(country_code)
+);
+
+CREATE Table if not exists Calls
+(caller_id int NOT NULL,
+callee_id int,
+duration int
+);
+
+insert into Person VALUES
+(3, 'Jonathan', '051-1234567'),
+(12, 'Elvis', '051-7654321'),
+(1, 'Moncef', '212-1234567'),
+(2, 'Maroua', '212-6523651'),
+(7, 'Meir', '972-1234567'),
+(9, 'Rachel', '972-0011100');
+
+INSERT into Country VALUES
+('Peru', 51),
+('Israel', 972),
+('Morocco', 212),
+('Germany', 49),
+('Ethiopia', 251);
+
+INSERT INTO Calls values
+(1, 9, 33),
+(2, 9, 4),
+(1, 2, 59),
+(3, 12, 102),
+(3, 12, 330),
+(12, 3, 5),
+(7, 9, 13),
+(7, 1, 3),
+(9, 7, 1),
+(1, 7, 7);
+
+select sum(duration)/(select count(*) from Country) as global_average from Calls;
+
+update Country set country_code = '049' where name = 'Germany';
+update Country set country_code = '051' where name = 'Peru';
+select c.name from Person p inner join
+Country c on left(p.phone_number,3) = c.country_code
+inner join (
+select caller_id as id, duration from Calls
+UNION ALL
+select callee_id as id, duration from Calls) cal
+on p.id = cal.id
+group by c.name
+having avg(cal.duration) > (select avg(duration) FROM Calls);
