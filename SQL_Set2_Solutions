@@ -237,14 +237,13 @@ order_date DATE,
 com_id int,
 sales_id int,
 amount int,
-constraint pk PRIMARY KEY(name),
+constraint pk PRIMARY KEY(order_id),
 constraint fk1 Foreign Key (com_id) REFERENCES Company(com_id),
 constraint fk2 Foreign Key (sales_id) REFERENCES SalesPerson(sales_id)
 );
 
 insert into SalesPerson VALUES
-(1, 'John', 100000, 6, STR_TO_DATE('4/1/2006','%m/%d/%Y'));
-insert into SalesPerson VALUES
+(1, 'John', 100000, 6, STR_TO_DATE('4/1/2006','%m/%d/%Y')),
 (2, 'Amy', 12000, 5, STR_TO_DATE('5/1/2010','%m/%d/%Y')),
 (3, 'Mark', 65000, 12, STR_TO_DATE('12/25/2008','%m/%d/%Y')),
 (4, 'Pam', 25000, 25, STR_TO_DATE('1/1/2005','%m/%d/%Y')),
@@ -252,3 +251,34 @@ insert into SalesPerson VALUES
 
 SELECT * FROM SalesPerson;
 
+insert into Company VALUES
+(1, 'RED', 'Boston'),
+(2, 'ORANGE', 'New York'),
+(3, 'YELLOW', 'Boston'),
+(4, 'GREEN', 'Austin');
+
+INSERT INTO Orders VALUES
+(1, STR_TO_DATE('1/1/2014','%m/%d/%Y'), 3, 4, 10000),
+(2, STR_TO_DATE('2/1/2014','%m/%d/%Y'), 4, 5, 5000),
+(3, STR_TO_DATE('3/1/2014','%m/%d/%Y'), 1, 1, 50000),
+(4, STR_TO_DATE('4/1/2014','%m/%d/%Y'), 1, 4, 25000);
+
+select name from SalesPerson where sales_id not in (
+select sales_id from Orders where com_id = (select com_id from Company where name = 'Red'));
+
+CREATE Table if not exists Triangle(
+x int NOT NULL,
+y int,
+z int,
+constraint pk PRIMARY KEY(x,y,z)
+);
+
+insert into Triangle VALUES
+(13, 15, 30),
+(10, 20, 15);
+
+select *,
+case when x+y > z then 'Yes'
+     else 'No'
+     end as triangle
+from Triangle;
