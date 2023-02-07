@@ -282,3 +282,189 @@ case when x+y > z then 'Yes'
      else 'No'
      end as triangle
 from Triangle;
+
+
+CREATE Table if not exists Point(
+x int NOT NULL,
+constraint pk PRIMARY KEY(x)
+);
+
+insert into Point VALUES
+(-1),
+(0),
+(2);
+
+select min(abs(p.x-p1.x)) as shortest_distance from Point p
+inner join Point p1
+on p.x != p1.x;
+
+CREATE Table if not exists ActorDirector(
+actor_id int NOT NULL,
+director_id int,
+TIMESTAMP int,
+constraint pk PRIMARY KEY(TIMESTAMP)
+);
+
+insert into ActorDirector VALUES
+(1, 1, 0),
+(1, 1, 1),
+(1, 1, 2),
+(1, 2, 3),
+(1, 2, 4),
+(2, 1, 5),
+(2, 1, 6);
+
+
+select distinct(actor_id),director_id from (
+select *,count(*)
+over(PARTITION BY actor_id,director_id) as net_count
+from ActorDirector) a
+where a.net_count >= 3;
+
+CREATE Table if not exists Sales(
+sale_id int,
+product_id int,
+year int,
+quantity int,
+price int,
+constraint pk PRIMARY KEY(sale_id,year),
+constraint fk Foreign Key (product_id) REFERENCES Product(product_id)
+);
+
+CREATE Table if not exists Product(
+product_id int,
+product_name varchar(20),
+constraint pk PRIMARY KEY(product_id)
+);
+
+insert into Sales VALUES
+(1, 100, 2008, 10, 5000),
+(2, 100, 2009, 12, 5000),
+(7, 200, 2011, 15, 9000);
+
+INSERT into Product VALUES
+(100, 'Nokia'),
+(200, 'Apple'),
+(300, 'Samsung');
+
+select p.product_name as ProductName,s.year as Year,
+s.price as Price
+from Product p
+inner JOIN
+Sales s
+USING(product_id);
+
+CREATE Table if not exists Project(
+project_id int NOT NULL,
+employee_id int,
+constraint pk PRIMARY KEY(project_id, employee_id))
+;
+
+CREATE Table if not exists Employee(
+employee_id int NOT NULL,
+name varchar(20),
+experience_years int,
+constraint pk PRIMARY KEY(employee_id))
+;
+
+INSERT INTO Project VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 1),
+(2, 4);
+
+INSERT INTO Employee VALUES
+(1, 'Khaled', 3),
+(2, 'Ali', 2),
+(3, 'John', 1),
+(4, 'Doe', 2);
+
+select p.project_id,
+round(avg(e.experience_years),2) as avg_experience
+from Project p
+INNER JOIN
+Employee e
+USING(employee_id)
+GROUP BY p.project_id;
+
+
+CREATE Table if not exists Product(
+product_id int NOT NULL,
+product_name varchar(20),
+unit_price int,
+constraint pk PRIMARY KEY(product_id)
+);
+
+CREATE Table if not exists Sales(
+seller_id int NOT NULL,
+product_id int,
+buyer_id int,
+sale_date date,
+quantity int,
+price int,
+constraint fk Foreign Key (product_id) REFERENCES Product(product_id)
+);
+
+INSERT INTO Product VALUES
+(1, 'S8', 1000),
+(2, 'G4', 800),
+(3, 'iPhone', 1400);
+
+INSERT into Sales VALUES
+(1, 1, 1, '2019-01-21', 2, 2000),
+(1, 2, 2, '2019-02-17', 1, 800),
+(2, 2, 3, '2019-06-02', 1, 800),
+(3, 3, 4, '2019-05-13', 2, 2800);
+
+with cte as (
+select seller_id,
+sum(price) as total_price
+from Sales
+GROUP BY seller_id)
+select seller_id from cte
+where total_price = (select max(total_price) from cte);
+
+
+select s.buyer_id as BuyerId
+from Product p
+INNER join Sales s
+USING(product_id)
+where p.product_name = 'S8'
+and p.product_name != 'iPhone';
+
+
+CREATE Table if not exists Customer(
+customer_id int NOT NULL,
+name varchar(20),
+visited_on date,
+amount int,
+constraint pk PRIMARY KEY(customer_id,visited_on)
+);
+
+INSERT into Customer VALUES
+(1, 'Jhon', '2019-01-01', 100),
+(2, 'Daniel', '2019-01-02', 110),
+(3, 'Jade', '2019-01-03', 120),
+(4, 'Khaled', '2019-01-04', 130),
+(5, 'Winston', '2019-01-05', 110),
+(6, 'Elvis', '2019-01-06', 140),
+(7, 'Anna', '2019-01-07', 150),
+(8, 'Maria', '2019-01-08', 80),
+(9, 'Jaze', '2019-01-09', 110),
+(1, 'Jhon', '2019-01-10', 130),
+(3, 'Jade', '2019-01-10', 150);
+
+with cte1 as 
+(select visited_on,SUM(amount) as amount
+FROM Customer
+GROUP BY visited_on
+ORDER BY visited_on),
+cte2 as (
+select visited_on,
+sum(amount) 
+OVER(ORDER BY visited_on ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as running_sum,
+avg(amount) OVER(ORDER BY visited_on ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as running_avg,
+dense_rank() OVER(order by visited_on) as rn
+from cte1)
+select visited_on,running_sum,round(running_avg,2) from cte2 where rn>6;
