@@ -468,3 +468,118 @@ avg(amount) OVER(ORDER BY visited_on ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) a
 dense_rank() OVER(order by visited_on) as rn
 from cte1)
 select visited_on,running_sum,round(running_avg,2) from cte2 where rn>6;
+
+
+CREATE Table if not exists Scores(
+player_name varchar(20),
+gender varchar(1),
+day date,
+score_points int,
+constraint pk PRIMARY KEY(gender,day)
+);
+
+INSERT INTO Scores VALUES
+('Aron', 'F', '2020-01-01', 17),
+('Alice', 'F', '2020-01-07', 23),
+('Bajrang', 'M', '2020-01-07', 7),
+('Khali', 'M', '2019-12-25', 11),
+('Slaman', 'M', '2019-12-30', 13),
+('Joe', 'M', '2019-12-31', 3),
+('Jose', 'M', '2019-12-18', 2),
+('Priya', 'F', '2019-12-31' ,23),
+('Priyanka', 'F', '2019-12-30', 17);
+
+select gender,day,
+sum(score_points) OVER(PARTITION BY gender ORDER BY day) as total
+from Scores;
+
+
+CREATE Table if not exists Logs(
+log_id int,
+constraint pk PRIMARY KEY(log_id)
+);
+
+INSERT INTO Logs VALUES
+(1),
+(2),
+(3),
+(7),
+(8),
+(10);
+
+select min(log_id) as start_id, max(log_id) as end_id from (
+select log_id,log_id - row_num as diff
+from (
+select log_id, 
+row_number() over() as row_num from Logs) a ) b
+GROUP BY diff;
+
+
+CREATE Table if not exists Students(
+student_id int,
+student_name varchar(20),
+constraint pk PRIMARY KEY(student_id)
+);
+
+
+CREATE Table if not exists Subjects(
+subject_name varchar(20),
+constraint pk PRIMARY KEY(subject_name)
+);
+
+
+CREATE Table if not exists Examinations(
+student_id int,
+subject_name varchar(20)
+);
+
+INSERT into Students VALUES
+(1, 'Alice'),
+(2, 'Bob'),
+(13, 'John'),
+(6, 'Alex');
+
+INSERT INTO Subjects VALUES
+('Math'),
+('Physics'),
+('Programming');
+
+INSERT INTO Examinations VALUES
+(1, 'Math'),
+(1, 'Physics'),
+(1, 'Programming'),
+(2, 'Programming'),
+(1, 'Physics'),
+(1, 'Math'),
+(13, 'Math'),
+(13, 'Programming'),
+(13, 'Physics'),
+(2, 'Math'),
+(1, 'Math');
+
+
+select distinct(st.student_id),
+s.subject_name,
+st.student_name,
+count(subject_name) OVER(partition by student_name,subject_name)
+from Examinations e
+cross JOIN Subjects s
+using(subject_name)
+right JOIN Students st
+USING(student_id)
+ORDER BY student_id;
+
+
+select t.student_id, t.student_name, t.subject_name, 
+    if(e.attended_exams is null, 0, e.attended_exams) as attended_exams
+from
+    (select *
+    from Students
+    cross join Subjects) t
+left join 
+    (select *, count(*) as attended_exams
+    from Examinations
+    group by student_id, subject_name) e
+on t.student_id = e.student_id and t.subject_name = e.subject_name
+order by student_id, subject_name;
+
