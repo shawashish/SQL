@@ -642,3 +642,49 @@ sum(amount) OVER(PARTITION BY left(trans_date,7),country) as total_amount
 from Transactions)
 select left(a.trans_date,7),a.country,a.trans_count,a.total_amount,b.net_count,b.approved_amount
 from cte1 a INNER join cte b on a.id = b.id;
+
+
+CREATE Table if not exists Actions(
+user_id int not NULL,
+post_id int,
+action_date date,
+action enum('view', 'like', 'reaction', 'comment', 'report', 'share'),
+extra varchar(20)
+);
+
+CREATE Table if not exists Removals(
+post_id int NOT NULL,
+remove_date date,
+constraint pk PRIMARY KEY(post_id)
+);
+
+INSERT into Actions VALUES
+(1, 1, '2019-07-01', 'view', 'null'),
+(1, 1, '2019-07-01', 'like', 'null'),
+(1, 1, '2019-07-01', 'share', 'null'),
+(2, 2, '2019-07-04', 'view', 'null'),
+(2, 2, '2019-07-04', 'report', 'spam'),
+(3, 4, '2019-07-04', 'view', 'null'),
+(3, 4, '2019-07-04', 'report', 'spam'),
+(4, 3, '2019-07-02', 'view', 'null'),
+(4, 3, '2019-07-02', 'report', 'spam'),
+(5, 2, '2019-07-03', 'view', 'null'),
+(5, 2, '2019-07-03', 'report', 'racism'),
+(5, 5, '2019-07-03', 'view', 'null'),
+(5, 5, '2019-07-03', 'report', 'racism');
+
+INSERT INTO Removals VALUES
+(2, '2019-07-20'),
+(3, '2019-07-18');
+
+with cte as 
+(select *,count(post_id) 
+over(PARTITION BY action_date) as spam_count
+from Actions where extra = 'spam'),
+cte2 as(
+select *,count(*)
+over(PARTITION BY action_date) as removed_count from Removals r INNER JOIN cte ct
+USING(post_id))
+select round(avg(b.removed_count/a.spam_count * 100)) as net_percentage FROM cte a
+INNER join cte2 b
+USING(post_id);
