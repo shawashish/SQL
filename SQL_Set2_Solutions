@@ -738,3 +738,95 @@ case when salary < 1000 then salary
      when salary > 10000 then round((salary - salary*49/100))
      end as salary
 from Salaries;
+
+
+CREATE Table if not exists Variables(
+name varchar(20),
+value int,
+constraint pk PRIMARY KEY(name)
+);
+
+CREATE Table if not exists Expressions(
+left_operand varchar(20),
+operator enum('<', '>', '='),
+right_operand varchar(20),
+constraint pk PRIMARY KEY(left_operand, operator, right_operand)
+);
+
+insert into Variables VALUES
+('x', 66),
+('y', 77);
+
+INSERT INTO Expressions VALUES
+('x', '>', 'y'),
+('x', '<', 'y'),
+('x', '=', 'y'),
+('y', '>', 'x'),
+('y', '<', 'x'),
+('x', '=', 'x');
+
+select e.left_operand,e.operator,e.right_operand,
+case when e.operator = '>' then if(v.value > v1.value,'True','False')
+     when e.operator = '<' then if(v.value < v1.value,'True','False')
+     when e.operator = '=' then if(v.value = v1.value,'True','False')
+     end as value
+from Expressions e
+left join Variables v
+on v.name = e.left_operand
+left join Variables v1
+on v1.name = e.right_operand;
+
+CREATE Table if not exists Person(
+id int NOT NULL,
+name varchar(20),
+phone_number varchar(20),
+constraint pk PRIMARY KEY(id)
+);
+
+CREATE Table if not exists Country(
+name varchar(20),
+country_code varchar(3),
+constraint pk PRIMARY KEY(country_code)
+);
+
+CREATE Table if not exists Calls(
+caller_id int,
+callee_id int,
+duration int
+);
+
+insert into Person VALUES
+(3, 'Jonathan', '051-1234567'),
+(12, 'Elvis', '051-7654321'),
+(1, 'Moncef', '212-1234567'),
+(2, 'Maroua', '212-6523651'),
+(7, 'Meir', '972-1234567'),
+(9, 'Rachel', '972-0011100');
+
+INSERT into Country VALUES
+('Peru', 051),
+('Israel', 972),
+('Morocco', 212),
+('Germany', 049),
+('Ethiopia', 251);
+
+INSERT INTO Calls values
+(1, 9, 33),
+(2, 9, 4),
+(1, 2, 59),
+(3, 12, 102),
+(3, 12, 330),
+(12, 3, 5),
+(7, 9, 13),
+(7, 1, 3),
+(9, 7, 1),
+(1, 7, 7);
+
+select c.name from Person p
+inner join Country c
+on left(p.phone_number,3) = c.country_code
+inner join Calls cl
+on (p.id = cl.callee_id
+or p.id = cl.caller_id)
+group by c.name
+having avg(cl.duration) > (select avg(duration) from Calls);
