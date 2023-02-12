@@ -856,3 +856,29 @@ select *,
 lag(spend,1,0) 
 OVER(PARTITION BY product_id ORDER BY transaction_date) as previous_year_spend
 from user_transactions) a;
+
+CREATE Table if not exists inventory(
+item_id int NOT NULL,
+item_type VARCHAR(20),
+item_category VARCHAR(20),
+square_footage FLOAT,
+constraint pk PRIMARY KEY(item_id)
+);
+
+INSERT into inventory VALUES
+(1374, 'prime_eligible', 'mini refrigerator', 68.00),
+(4245, 'not_prime' ,'standing lamp', 26.40),
+(2452, 'prime_eligible', 'television', 85.00),
+(3255, 'not_prime', 'side table', 22.60),
+(1672, 'prime_eligible', 'laptop', 8.50);
+
+
+Not solved - 
+select 500000 - total_square_foot from (
+with cte as (
+SELECT item_type,SUM(square_footage) as sum_area,COUNT(*) as item_count
+from inventory
+GROUP BY item_type)
+select round(500000/sum_area) as total_square_foot , 500000/sum_area * item_count as net_count
+from cte
+GROUP BY item_type) a
