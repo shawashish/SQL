@@ -882,3 +882,24 @@ GROUP BY item_type)
 select round(500000/sum_area) as total_square_foot , 500000/sum_area * item_count as net_count
 from cte
 GROUP BY item_type) a
+
+CREATE Table if not exists user_actions(
+user_id int NOT NULL,
+event_id int,
+event_type enum("sign-in", "like", "comment"),
+event_date datetime
+);
+
+insert into user_actions VALUES
+(445, 7765, 'sign-in', str_to_date('05/31/2022 12:00:00', '%m/%d/%Y %H:%i:%s')),
+(742, 6458, 'sign-in', str_to_date('06/03/2022 12:00:00', '%m/%d/%Y %H:%i:%s')),
+(445, 3634, 'like', str_to_date('06/05/2022 12:00:00', '%m/%d/%Y %H:%i:%s')),
+(742, 1374, 'comment', str_to_date('06/05/2022 12:00:00', '%m/%d/%Y %H:%i:%s')),
+(648, 3124, 'like', str_to_date('06/18/2022 12:00:00', '%m/%d/%Y %H:%i:%s'));
+
+select month(next_date),count(*) from (
+select *,
+lead(event_date,1,0) OVER(PARTITION BY user_id ORDER BY event_date) as next_date
+from user_actions) a
+where PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM next_date),EXTRACT(YEAR_MONTH FROM event_date)) = 1
+GROUP BY next_date;
