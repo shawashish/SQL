@@ -830,3 +830,29 @@ on (p.id = cl.callee_id
 or p.id = cl.caller_id)
 group by c.name
 having avg(cl.duration) > (select avg(duration) from Calls);
+
+
+select name from Employee ORDER BY name;
+
+CREATE Table if not exists user_transactions(
+transaction_id int NOT NULL,
+product_id int,
+spend decimal,
+transaction_date datetime,
+constraint pk PRIMARY KEY(transaction_id)
+);
+
+insert into user_transactions VALUES
+(1341, 123424, 1500.60, STR_TO_DATE('12/31/2019','%m/%d/%Y'));
+insert into user_transactions VALUES
+(1423, 123424, 1000.20, STR_TO_DATE('12/31/2020','%m/%d/%Y')),
+(1623, 123424, 1246.44, STR_TO_DATE('12/31/2021','%m/%d/%Y')),
+(1322, 123424, 2145.32, STR_TO_DATE('12/31/2022','%m/%d/%Y'));
+
+
+select *,((spend - previous_year_spend)/previous_year_spend * 100) as yoy
+from (
+select *,
+lag(spend,1,0) 
+OVER(PARTITION BY product_id ORDER BY transaction_date) as previous_year_spend
+from user_transactions) a;
