@@ -59,3 +59,45 @@ select name from Employee
 where salary > 2000
 and month < 10
 ORDER BY employee_id;
+
+
+CREATE Table if not exists TRIANGLES(
+a int,
+b int,
+c int
+);
+
+insert into TRIANGLES VALUES
+(20,20,23),
+(20,20,20),
+(20,21,22),
+(13,14,30);
+
+select
+case when a + b < c then 'Not a Triangle'
+     when a = b and b = c and c = a then 'Equilateral'
+     when (a=b) or (b=c) or (c=a) then 'Isosceles'
+     when a <> b <> c then 'Scalene'
+END
+as traingletype
+from TRIANGLES;
+
+CREATE Table if not exists Employees(
+id int,
+name varchar(20),
+salary int,
+constraint pk PRIMARY KEY(id)
+);
+
+insert into Employees VALUES
+(1,'Kristeen',1420),
+(2,'Ashley',2006),
+(3,'Julia',2210),
+(4,'Maria',3000);
+
+with cte as(
+select avg(salary) as actual_avg_salary,avg(replace(salary,'0','')) as wrong_avg_salary 
+from Employees)
+select round(actual_avg_salary - wrong_avg_salary) as diff
+from cte;
+
