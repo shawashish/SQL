@@ -163,3 +163,87 @@ select
             GROUP BY nameorder)
 select Doctor,Professor,Singer,Actor from cte;
 
+
+CREATE Table if not exists BST(
+N int,
+P int
+);
+
+INSERT into BST VALUES
+(1,2),
+(3,2),
+(6,8),
+(9,8),
+(2,5),
+(8,5),
+(5,NULL);
+
+select * from BST;
+
+select N,
+case when P is null then 'Root'
+     when N in (select P from BST) then 'Inner'
+     else 'Leaf'
+     end
+from BST
+ORDER BY N;
+
+CREATE Table if not exists Company(
+company_code VARCHAR(10),
+founder VARCHAR(20),
+constraint pk PRIMARY KEY(company_code)
+);
+drop table Company;
+CREATE Table if not exists Lead_Manager(
+company_code VARCHAR(10),
+lead_manager_code VARCHAR(10),
+constraint pk PRIMARY KEY(lead_manager_code),
+constraint fk Foreign Key(company_code) REFERENCES Company(company_code)
+);
+
+CREATE Table if not exists Senior_Manager(
+senior_manager_code VARCHAR(10),
+company_code VARCHAR(10),
+lead_manager_code VARCHAR(10),
+constraint pk PRIMARY KEY(senior_manager_code),
+constraint fk1 Foreign Key(company_code) REFERENCES Company(company_code),
+constraint fk2 Foreign Key(lead_manager_code) REFERENCES Lead_Manager(lead_manager_code)
+);
+
+CREATE Table if not exists Manager(
+manager_code VARCHAR(10),
+senior_manager_code VARCHAR(10),
+company_code VARCHAR(10),
+lead_manager_code VARCHAR(10),
+constraint pk PRIMARY KEY(manager_code),
+constraint fk3 Foreign Key(company_code) REFERENCES Company(company_code),
+constraint fk4 Foreign Key(senior_manager_code) REFERENCES Senior_Manager(senior_manager_code),
+constraint fk5 Foreign Key(lead_manager_code) REFERENCES Lead_Manager(lead_manager_code)
+);
+
+CREATE Table if not exists Employee(
+employee_code VARCHAR(10),
+manager_code VARCHAR(10),
+senior_manager_code VARCHAR(10),
+company_code VARCHAR(10),
+lead_manager_code VARCHAR(10),
+constraint pk PRIMARY KEY(employee_code),
+constraint fk6 Foreign Key(manager_code) REFERENCES Manager(manager_code),
+constraint fk7 Foreign Key(company_code) REFERENCES Company(company_code),
+constraint fk8 Foreign Key(senior_manager_code) REFERENCES Senior_Manager(senior_manager_code),
+constraint fk9 Foreign Key(lead_manager_code) REFERENCES Lead_Manager(lead_manager_code)
+);
+
+Insert INTO Company VALUES
+('C1','Monika'),
+('C2','Samantha');
+
+insert into Lead_Manager VALUES
+('C1','LM1'),
+('C2','LM2');
+
+INSERT INTO Senior_Manager VALUES
+('SM1','C1','LM1'),
+('SM2','C1','LM1'),
+('SM3','C2','LM2');
+
