@@ -147,3 +147,19 @@ ORDER BY name asc;
 select concat('There are a total of ',count(*),' ',lower(occupation),'s') from OCCUPATIONS
 group by occupation
 order by count(*), occupation;
+
+with cte as (
+select
+        NameOrder,
+        max(case Occupation when 'Doctor' then Name end) as Doctor,
+        max(case Occupation when 'Professor' then Name end) as Professor,
+        max(case Occupation when 'Singer' then Name end) as Singer,
+        max(case Occupation when 'Actor' then Name end) as Actor
+    from(select
+                Occupation,
+                Name,
+                row_number() over(partition by Occupation order by Name ASC) as NameOrder
+            from OCCUPATIONS) as Namelists
+            GROUP BY nameorder)
+select Doctor,Professor,Singer,Actor from cte;
+
