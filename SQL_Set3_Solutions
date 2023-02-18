@@ -247,3 +247,27 @@ INSERT INTO Senior_Manager VALUES
 ('SM2','C1','LM1'),
 ('SM3','C2','LM2');
 
+INSERT into Manager VALUES
+('M1','SM1','C1','LM1'),
+('M2','SM3','C2','LM2'),
+('M3','SM3','C2','LM2');
+
+INSERT INTO Employee VALUES
+('E1','M1','SM1','C1','LM1'),
+('E2','M1','SM1','C1','LM1'),
+('E3','M2','SM3','C2','LM2'),
+('E4','M3','SM3','C2','LM2');
+
+SELECT c.company_code, c.founder,count(distinct lm.lead_manager_code),
+count(distinct sm.senior_manager_code),count(distinct m.manager_code),count(distinct e.employee_code)
+from Company c
+inner join Lead_Manager lm
+using(company_code)
+inner join Senior_Manager sm
+using(lead_manager_code)
+inner join Manager m
+using(senior_manager_code)
+inner join Employee e
+using(manager_code)
+group BY c.company_code,c.founder
+ORDER BY c.company_code;
