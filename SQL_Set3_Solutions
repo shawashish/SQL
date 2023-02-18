@@ -123,3 +123,27 @@ insert into Employee VALUES
 
 select concat_ws(' ',max(months * salary),count(*)) as output from Employee
 where (salary * months)>= (select max(salary * months) from Employee);
+
+CREATE Table if not exists OCCUPATIONS(
+name varchar(20),
+occupation VARCHAR(20)
+);
+
+INSERT into OCCUPATIONS VALUES
+('Samantha','Doctor'),
+('Julia','Actor'),
+('Maria','Actor'),
+('Meera','Singer'),
+('Ashley','Professor'),
+('Ketty','Professor'),
+('Christeen','Professor'),
+('Jane','Actor'),
+('Jenny','Doctor'),
+('Priya','Singer');
+
+select concat(name,'(',left(occupation,1),')') from OCCUPATIONS
+ORDER BY name asc;
+
+select concat('There are a total of ',count(*),' ',lower(occupation),'s') from OCCUPATIONS
+group by occupation
+order by count(*), occupation;
